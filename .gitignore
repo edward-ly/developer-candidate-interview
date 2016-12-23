@@ -1,3 +1,6 @@
+palindrome/specs/.bundle/*
+palindrome/specs/bin/*
+palindrome/specs/Gemfile*
 schedule/.input.csv
 schedule/answer_key.rb
 schedule/test_candidates/**
