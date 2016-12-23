@@ -24,7 +24,20 @@ class Tester
 
       # 4. check eack pair of characters one at a time for matches
 
+      # start at the two ends of the string
+      i = 0
+      j = test_string.length - 1
 
+      # while string[i] and string[j] refer to different characters, make comparison
+      # middle character (when i == j) is not important in a palindrome
+      while i < j
+        return false if not test_string[i] == test_string[j]
+        i += 1
+        j -= 1
+      end
+
+      # all characters match
+      return true
     end
   end
 
@@ -42,8 +55,7 @@ class Tester
       test_string = test_string.downcase
 
       # 4. compare string with reverse string and return result
-
-
+      test_string == test_string.reverse
     end
   end
 end
