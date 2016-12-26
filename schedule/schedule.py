@@ -82,10 +82,29 @@ if __name__ == "__main__":
             i += 1
 
         if i < len(instructors):
-            # compare dates and times
-            if (row[3] < instructors[i][3] or row[5] > instructors[i][4] or \
-                row[4] < instructors[i][5] or row[6] > instructors[i][6]):
+            # compare dates and times (as strings)
+            if ( row[3] < instructors[i][3] or row[5] > instructors[i][4] or \
+                 row[4] < instructors[i][5] or row[6] > instructors[i][6] ):
                 reasons.add("instructor not available")
+
+            # calculate lesson duration in minutes
+            duration = ( int( row[6][0:2] ) - int( row[4][0:2] ) ) * 60 + \
+                         int( row[6][3:5] ) - int( row[4][3:5] )
+
+            # duration column can be modified to list just number of minutes,
+            # hard-coded strings are a temporary solution
+            expected_duration = 60 # default value
+            if instructors[i][7] == "1 hour":
+                expected_duration = 60
+            elif instructors[i][7] == "1/2 hour":
+                expected_duration = 30
+            elif instructors[i][7] == "45 minutes":
+                expected_duration = 45
+
+            if ( row[2] == "Private Lesson" ) and ( duration % expected_duration != 0 ):
+                reasons.add("invalid lesson duration")
+            if ( row[2] == "Group Lesson" ) and ( duration != expected_duration ):
+                reasons.add("invalid lesson duration")
         else:
             reasons.add("instructor not found")
 
