@@ -75,9 +75,9 @@ if __name__ == "__main__":
 
         # find row that matches instructor's name and lesson type
         i = 1 # ignore first row (header)
-        while ( i < len(instructors) ) and \
-                ( ( row[7].title() != instructors[i][0] ) or \
-                  ( row[2]         != instructors[i][1] ) ):
+        while i < len(instructors) and \
+                ( row[7].title() != instructors[i][0] or \
+                  row[2]         != instructors[i][1] ):
             i += 1
 
         if i < len(instructors):
