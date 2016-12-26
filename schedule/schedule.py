@@ -43,8 +43,8 @@
 #
 # Data Structures:
 # array: list of instructors
-# array: list of valid lessons
-# array: list of all requests
+# array: list of all schedule requests
+# array: list of accepted lessons
 # set: list of reasons
 #
 
@@ -54,6 +54,7 @@ def print_conflict(id, reasons):
     print ""
     print "Request ID: " + id
     print "Reason for Conflict: " + ", ".join(reasons)
+    print ""
 
 if __name__ == "__main__":
     instructors = []
@@ -82,7 +83,8 @@ if __name__ == "__main__":
 
         if i < len(instructors):
             # compare dates and times
-            print ", ".join([ instructors[i][0], instructors[i][1] ])
+            if (row[3] < instructors[i][3] or row[5] > instructors[i][4]):
+                reasons.add("instructor not available")
         else:
             reasons.add("instructor not found")
 
@@ -92,5 +94,3 @@ if __name__ == "__main__":
             print_conflict(row[0], reasons)
         else:
             lessons.append(row)
-
-    print ""
