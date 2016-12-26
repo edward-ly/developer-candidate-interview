@@ -50,6 +50,11 @@
 
 import csv
 
+def print_conflict(id, reasons):
+    print ""
+    print "Request ID: " + id
+    print "Reason for Conflict: " + ", ".join(reasons)
+
 if __name__ == "__main__":
     instructors = []
     lessons = []
@@ -84,6 +89,8 @@ if __name__ == "__main__":
         # search through lessons
 
         if len(reasons) > 0:
-            print ", ".join(reasons)
+            print_conflict(row[0], reasons)
         else:
             lessons.append(row)
+
+    print ""
