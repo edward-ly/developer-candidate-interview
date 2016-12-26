@@ -1,6 +1,6 @@
 # File: schedule.py
 # Author: Edward Ly
-# Last Modified: 25 December 2016
+# Last Modified: 26 December 2016
 # Outputs any schedule conflicts found by filling instructors' schedules
 # (found in the 'instructor_availability.csv' file) with students' requested
 # appointments (found in the 'input.csv' file).
@@ -20,13 +20,14 @@
 #    a. search for instructor and lesson type in instructors array
 #       if no matching instructor found
 #          add conflict reason: instructor not found
-#    b. compare requested date/time range with instructor's date/time range
-#       if requested date/time falls outside instructor's range,
-#          add conflict reason: instructor not available
-#       if private lesson and duration is not a whole number of blocks long
-#          add conflict reason: invalid lesson duration
-#       if group lesson and duration is not one block long
-#          add conflict reason: invalid lesson duration
+#       else
+#          compare requested date/time range with instructor's date/time range
+#          if requested date/time falls outside instructor's range,
+#             add conflict reason: instructor not available
+#          if private lesson and duration is not a whole number of blocks long
+#             add conflict reason: invalid lesson duration
+#          if group lesson and duration is not one block long
+#             add conflict reason: invalid lesson duration
 #    c. search list of previously scheduled lessons
 #       if group lesson
 #          if instructor and date/time slot match a previous group lesson request
@@ -38,23 +39,51 @@
 #       if students match and requested date/time overlaps a previous request
 #          add conflict reason: student not available
 #    d. if there are any conflict reasons, print conflict to terminal
-#    e. if there are no conflicts, add lesson to lessons array
+#       else (if there are no conflicts), add lesson to lessons array
 #
 # Data Structures:
 # array: list of instructors
 # array: list of valid lessons
+# array: list of all requests
 # set: list of reasons
 #
 
 import csv
 
 if __name__ == "__main__":
+    instructors = []
+    lessons = []
+    requests = []
+
     with open('instructor_availability.csv', 'rb') as inst_csv:
         inst_reader = csv.reader(inst_csv)
         for row in inst_reader:
-            print ', '.join(row)
+            instructors.append(row)
 
     with open('input.csv', 'rb') as input_csv:
         input_reader = csv.reader(input_csv)
         for row in input_reader:
-            print ', '.join(row)
+            requests.append(row)
+
+    for row in requests[1:]: # ignore first row (header)
+        reasons = set()
+
+        # find row that matches instructor's name and lesson type
+        i = 1 # ignore first row (header)
+        while ( i < len(instructors) ) and \
+                ( ( row[7].title() != instructors[i][0] ) or \
+                  ( row[2]         != instructors[i][1] ) ):
+            i += 1
+
+        if i < len(instructors):
+            # compare dates and times
+            print ", ".join([ instructors[i][0], instructors[i][1] ])
+        else:
+            reasons.add("instructor not found")
+
+        # search through lessons
+
+        if len(reasons) > 0:
+            print ", ".join(reasons)
+        else:
+            lessons.append(row)
