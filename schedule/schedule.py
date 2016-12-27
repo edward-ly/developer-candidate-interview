@@ -63,6 +63,13 @@ def has_overlap(lesson, row):
            ( ( lesson[4] >= row[4] and lesson[4] <  row[6] ) or \
              ( lesson[6] >  row[4] and lesson[6] <= row[6] ) )
 
+def lessons_match(lesson, row):
+    return lesson[3] == row[3] and \
+           lesson[4] == row[4] and \
+           lesson[5] == row[5] and \
+           lesson[6] == row[6] and \
+           lesson[7].title() == row[7].title()
+
 if __name__ == "__main__":
     instructors = []
     lessons = []
@@ -116,14 +123,36 @@ if __name__ == "__main__":
         else:
             reasons.add("instructor not found")
 
-        # search through lessons
-        for lesson in lessons:
-            # if dates and times overlap when trying to schedule private lesson
-            if row[2] == "Private Lesson" and has_overlap(lesson, row):
-                if row[7].title() == lesson[7].title():
-                    reasons.add("instructor not available")
-                if row[1] == lesson[1]:
-                    reasons.add("student not available")
+        # search through previous lessons
+        if row[2] == "Group Lesson":
+            # determine current capacity of group lesson
+            capacity = 0
+
+            for lesson in lessons:
+                if lessons_match(lesson, row):
+                    if row[1] == lesson[1]:
+                        # student already scheduled lesson
+                        reasons.add("student not available")
+                    else:
+                        capacity += 1
+
+                # not the same lesson, but still check for date/time conflicts
+                elif has_overlap(lesson, row):
+                    if row[7].title() == lesson[7].title():
+                        reasons.add("instructor not available")
+                    if row[1] == lesson[1]:
+                        reasons.add("student not available")
+
+            if i < len(instructors) and capacity >= int(instructors[i][2]):
+                reasons.add("instructor not available")
+        elif row[2] == "Private Lesson":
+            # just check previous lessons for conflicts
+            for lesson in lessons:
+                if has_overlap(lesson, row):
+                    if row[7].title() == lesson[7].title():
+                        reasons.add("instructor not available")
+                    if row[1] == lesson[1]:
+                        reasons.add("student not available")
 
         if len(reasons) > 0:
             print_conflict(row[0], reasons)
