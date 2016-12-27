@@ -3,7 +3,7 @@
 # Last Modified: 26 December 2016
 # Outputs any schedule conflicts found by filling instructors' schedules
 # (found in the 'instructor_availability.csv' file) with students' requested
-# appointments (found in the 'input.csv' file).
+# lessons (found in the 'input.csv' file).
 #
 # Assumptions:
 # 1. input files must be named exactly as above
@@ -11,12 +11,17 @@
 # 2. all times are specified in the same local time zone (in this case, EST)
 # 3. all dates and times are valid and in a format that allows them
 #    to be compared as strings
+# 4. there are no restrictions on when a lesson can start or end
+#    (e.g. a 1-hour lesson can start at 10:12 AM)
+# 5. some names are not case sensitive (the title() method normalizes case
+#    before names are compared)
 #
 # Algorithm:
 # 1. open the 'instructor_availability.csv' file
 #    copy list of instructors into instructors array
 # 2. open and read the 'input.csv' file
-# 3. for each row/schedule request:
+#    copy list of requests into requests array
+# 3. for each row/lesson request:
 #    a. search for instructor and lesson type in instructors array
 #       if no matching instructor found
 #          add conflict reason: instructor not found
@@ -34,12 +39,12 @@
 #             increment capacity counter
 #             if capacity reached
 #                add conflict reason: instructor not available
-#          else if requested date/time overlaps previously requested date/time
+#          else if requested date/time overlaps previous date/time
 #             if instructors match
 #                add conflict reason: instructor not available
 #             if students match
 #                add conflict reason: student not available
-#       if private lesson
+#       if private lesson and requested date/time overlaps previous date/time
 #          if instructors match
 #             add conflict reason: instructor not available
 #          if students match
@@ -48,10 +53,11 @@
 #       else (if there are no conflicts), add lesson to lessons array
 #
 # Data Structures:
+# csv module: read csv files
 # array: list of instructors
 # array: list of all schedule requests
 # array: list of accepted lessons
-# set: list of reasons
+# set: list of reasons (sets have no duplicate elements)
 #
 
 import csv
@@ -109,7 +115,6 @@ if __name__ == "__main__":
             i += 1
 
         if i < len(instructors):
-            # compare dates and times (as strings)
             # if dates or times are not in range
             if ( row[3] < instructors[i][3] or row[5] > instructors[i][4] or \
                  row[4] < instructors[i][5] or row[6] > instructors[i][6] ):
@@ -129,9 +134,8 @@ if __name__ == "__main__":
             elif instructors[i][7] == "45 minutes":
                 expected_duration = 45
 
-            if ( row[2] == "Private Lesson" ) and ( duration % expected_duration != 0 ):
-                reasons.add("invalid lesson duration")
-            if ( row[2] == "Group Lesson" ) and ( duration != expected_duration ):
+            if ( ( row[2] == "Private Lesson" ) and ( duration % expected_duration != 0 ) ) or \
+               ( ( row[2] == "Group Lesson" ) and ( duration != expected_duration ) ):
                 reasons.add("invalid lesson duration")
         else:
             reasons.add("instructor not found")
