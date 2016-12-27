@@ -63,11 +63,11 @@ def has_overlap(lesson, row):
            ( ( lesson[4] >= row[4] and lesson[4] <  row[6] ) or \
              ( lesson[6] >  row[4] and lesson[6] <= row[6] ) )
 
-def lessons_match(lesson, row):
-    return lesson[3] == row[3] and \
-           lesson[4] == row[4] and \
-           lesson[5] == row[5] and \
-           lesson[6] == row[6] and \
+def same_lesson(lesson, row):
+    return lesson[3] <= row[3] and \
+           lesson[4] <= row[4] and \
+           lesson[5] >= row[5] and \
+           lesson[6] >= row[6] and \
            lesson[7].title() == row[7].title()
 
 if __name__ == "__main__":
@@ -129,7 +129,7 @@ if __name__ == "__main__":
             capacity = 0
 
             for lesson in lessons:
-                if lessons_match(lesson, row):
+                if same_lesson(lesson, row):
                     if row[1] == lesson[1]:
                         # student already scheduled lesson
                         reasons.add("student not available")
